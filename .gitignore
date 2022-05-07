@@ -2,3 +2,4 @@ cli version/tools/__pycache__
 web_app/venv
 web_app/.env
 web_app/__pycache__
+web_app/users.json

@@ -5,7 +5,7 @@ import random
 
 def generate_env():
     os.environ['SECRET_KEY'] = ''.join(random.choices(string.ascii_uppercase + string.digits, k = 16))
-    os.environ['UPLOAD_FOLDER'] = os.path.abspath('uploads')
+    os.environ['UPLOAD_FOLDER'] = 'uploads'
     os.environ['DEBUG'] = '0'
     os.environ['TESTING'] = '0'
     with open('.env', 'w') as f:
