@@ -3,8 +3,8 @@ import sys
 from base64 import b64decode, b64encode
 from tools import ConnectionFeedbackLoop
 
-user = "A"
-server = ('6.tcp.ngrok.io', 15002)
+user = "Anushka"
+server = ('2.tcp.ngrok.io', 11633)
 
 connection = socket.create_connection(server)
 
