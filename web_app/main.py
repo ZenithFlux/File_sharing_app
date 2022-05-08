@@ -1,8 +1,7 @@
-from flask import Flask, render_template, request, session, send_from_directory, url_for, redirect
+from flask import Flask, render_template, request, session, url_for, redirect, flash
 from flask_socketio import SocketIO, emit
 from werkzeug.utils import secure_filename
 import config
-import os
 import json
 import threading
 
@@ -29,7 +28,12 @@ socketio = SocketIO(app)
 def homepage():
     if request.method == 'POST':
         user = request.form['name']
-        return redirect(url_for('senderpage', user = user))
+        
+        if user in load_users():
+            flash("Another user with same ID is currently active")
+            return render_template('index.html')
+        
+        else: return redirect(url_for('senderpage', user = user))
 
     else: return render_template('index.html')
     
@@ -38,10 +42,8 @@ def senderpage():
     if request.method == 'POST':
         receiver_id = request.form['receiver']
         f = request.files['file']
-        #path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
-        #f.save(path)
         users = load_users()
-        emit('sending_file', (secure_filename(f.filename), f.read()), to = users[receiver_id], namespace='/')
+        emit('sending_file', (secure_filename(f.filename), f.read(), request.form['id']), to = users[receiver_id], namespace='/')
         return render_template('sender.html', user = request.form['id'])
         
     else:
@@ -66,11 +68,15 @@ def disconnection():
     sem.release()
     print(f'\n{session["id"]} disconnected!\n')
     
+@socketio.on('confirmation')
+def confirmation(filename, sender):
+    users = load_users()
+    emit('alert', "'"+filename+"' is sucessfully downloaded by '"+session['id']+"'.", to = users[sender])
+
+# To print js output in python console    
 @socketio.on('print')
 def print_data(text):
     print(f'\n[{session["id"]}]: {text}\n')
-    #send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-    #os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, port=80)

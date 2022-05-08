@@ -1,11 +1,20 @@
 {% extends "base.html" %}
 {% block title %}Login{% endblock %}
+{% block scripts %}
+  {% with text = get_flashed_messages() %}
+    {% if text %}
+     <script type="text/javascript" charset="utf-8">
+       window.alert("{{text[0]}}")
+     </script>
+    {% endif %}
+  {% endwith %}
+{% endblock %}
 {% block body %}
 <section class="text-gray-600 body-font relative">
     <div class="container px-5 py-24 mx-auto">
       <div class="flex flex-col text-center w-full mb-4">
         <h1 class="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">FileMessenger</h1>
-        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">Messaging cum File Sharing app</p>
+        <p class="lg:w-2/3 mx-auto leading-relaxed text-base">File Sharing app</p>
       </div>
       <div class="lg:w-1/2 md:w-2/3 mx-auto">
         <form action = "http://localhost:5000/" method = "post" class="flex flex-wrap -m-2">
