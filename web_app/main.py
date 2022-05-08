@@ -38,38 +38,39 @@ def senderpage():
     if request.method == 'POST':
         receiver_id = request.form['receiver']
         f = request.files['file']
-        path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
-        f.save(path)
+        #path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename))
+        #f.save(path)
         users = load_users()
-        emit('sending_file', secure_filename(f.filename), to = users[receiver_id], namespace='/')
-        return render_template('sender.html', user = request.form['user'])
+        emit('sending_file', (secure_filename(f.filename), f.read()), to = users[receiver_id], namespace='/')
+        return render_template('sender.html', user = request.form['id'])
         
     else:
         return render_template('sender.html', user = request.args.get('user'))
 
 @socketio.on('connected')
-def connected(info):
-    session['id'] = info['id']
+def connected(user):
+    session['id'] = user
     sem.acquire()
     users = load_users()
     users[session['id']] = request.sid
     save_users(users)
     sem.release()
+    print(f'\n{session["id"]} connected!\n')
     
 @socketio.on('disconnect')
 def disconnection():
-    print(f'\n{session["id"]} disconnected!\n')
     sem.acquire()
     users = load_users()
     del users[session['id']]
     save_users(users)
     sem.release()
+    print(f'\n{session["id"]} disconnected!\n')
     
-@socketio.on('sending_file')
-def receive_file(filename):
-    send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
-    print(f'\n{filename} is received by {session["id"]}\n')
-    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+@socketio.on('print')
+def print_data(text):
+    print(f'\n[{session["id"]}]: {text}\n')
+    #send_from_directory(app.config['UPLOAD_FOLDER'], filename, as_attachment=True)
+    #os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
     
 if __name__ == '__main__':
     socketio.run(app)
