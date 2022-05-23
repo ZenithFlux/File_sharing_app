@@ -10,7 +10,7 @@
 {% block body %}
 <section class="text-gray-600 body-font">
   <div class="container px-5 py-24 mx-auto flex flex-wrap items-center">
-    <form action = "http://localhost:5000/sender" method = "post" enctype="multipart/form-data" class="lg:w-3/12 md:w-1/2 bg-gray-100 rounded-lg px-8 py-4 flex flex-col w-full mx-auto mt-10 md:mt-0">
+    <form action = "{{ url_for('senderpage') }}" method = "post" enctype="multipart/form-data" class="lg:w-3/12 md:w-1/2 bg-gray-100 rounded-lg px-8 py-4 flex flex-col w-full mx-auto mt-10 md:mt-0">
       <p class="w-auto ml-auto mb-2 leading-relaxed text-sm">Your ID: {{user}}</p>
       <h2 class="text-gray-900 text-lg font-medium title-font">Send File To</h2>
       <div class="relative mb-4">

@@ -16,7 +16,6 @@ def load_users():
     with open('users.json', 'r') as f:
         return json.load(f)
         
-save_users({})
 
 #------------------App----------------------
 
@@ -27,7 +26,7 @@ socketio = SocketIO(app)
 @app.route('/', methods = ['GET', 'POST'])
 def homepage():
     if request.method == 'POST':
-        user = request.form['name']
+        user = request.form['name'].strip()
         
         if user in load_users():
             flash("Another user with same ID is currently active")
@@ -40,7 +39,7 @@ def homepage():
 @app.route('/sender', methods = ['GET', 'POST'])
 def senderpage():
     if request.method == 'POST':
-        receiver_id = request.form['receiver']
+        receiver_id = request.form['receiver'].strip()
         f = request.files['file']
         users = load_users()
         emit('sending_file', (secure_filename(f.filename), f.read(), request.form['id']), to = users[receiver_id], namespace='/')
@@ -79,4 +78,5 @@ def print_data(text):
     print(f'\n[{session["id"]}]: {text}\n')
     
 if __name__ == '__main__':
+    save_users({})
     socketio.run(app, port=80)
