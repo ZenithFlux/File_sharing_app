@@ -27,6 +27,7 @@ socketio = SocketIO(app)
 def homepage():
     if request.method == 'POST':
         user = request.form['name'].strip()
+        session['logged'] = 1
         
         if user in load_users():
             flash("Another user with same ID is currently active")
@@ -46,7 +47,11 @@ def senderpage():
         return render_template('sender.html', user = request.form['id'])
         
     else:
-        return render_template('sender.html', user = request.args.get('user'))
+        if 'logged' in session:
+            del session['logged']
+            return render_template('sender.html', user = request.args.get('user'))
+        else:
+            return redirect(url_for("homepage"))
 
 @socketio.on('connected')
 def connected(user):
