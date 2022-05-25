@@ -28,8 +28,11 @@ def homepage():
     if request.method == 'POST':
         user = request.form['name'].strip()
         session['logged'] = 1
+        sem.acquire()
+        users = load_users()
+        sem.release()
         
-        if user in load_users():
+        if user in users:
             flash("Another user with same ID is currently active")
             return render_template('index.html')
         
@@ -42,7 +45,9 @@ def senderpage():
     if request.method == 'POST':
         receiver_id = request.form['receiver'].strip()
         f = request.files['file']
+        sem.acquire()
         users = load_users()
+        sem.release()
         emit('sending_file', (secure_filename(f.filename), f.read(), request.form['id']), to = users[receiver_id], namespace='/')
         return render_template('sender.html', user = request.form['id'])
         
@@ -74,7 +79,9 @@ def disconnection():
     
 @socketio.on('confirmation')
 def confirmation(filename, sender):
+    sem.acquire()
     users = load_users()
+    sem.release()
     emit('alert', "'"+filename+"' is sucessfully downloaded by '"+session['id']+"'.", to = users[sender])
 
 # To print js output in python console    
